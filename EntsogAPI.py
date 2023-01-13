@@ -11,7 +11,7 @@ class EntsogAPI:
         'interruptions','AggregatedData','tariffssimulations','tariffsfulls','urgentmarketmessages',
         'connectionpoints','operators','balancingzones','operatorpointdirections','Interconnections',
         'aggregateInterconnections')
-        self.__payload = {'limit':'5'}
+        self.__payload = {'offset':'0', 'limit':'5'}
         self.build_uri(category=category)
         self.set_payload(**kwargs)
 
@@ -41,13 +41,12 @@ class EntsogAPI:
             self.__payload[property] = str(value)
 
     def build_uri(self, category:str) -> None:
-        """Set up the """
+        """Set up URI for the selected category"""
         if category in self.__categories:
             b_uri = self.__base_uri + category
             self.__set_uri(uri=b_uri)
         else:
             raise Exception(f"API category '{category}' does not exist.\nPlease select one of the following:\n{','.join(self.__categories)}")
-        pass
     
     def get_uri(self) -> str:
         """Get Curent API URI"""
@@ -56,10 +55,18 @@ class EntsogAPI:
     def __str__(self) -> str:
         """Returns API result"""
         if self.__r.status_code < 300:
+            print(type(self.__r.json()))
             return json.dumps(self.__r.json(), indent=2)
         else:
             return f"Status Code: {self.__r.status_code}"
 
+    def read_json(self, offset=0, limit=1000, ) -> dict:
+        """Read API Content"""
+        self.set_payload(offset=offset, limit=limit)
+        content = self.__r.json()
+        if content:
+            return content | self.read(offset=offset+limit, limit=limit)
+        return None
 
 if __name__=='__main__':
     #d = EntsogAPI('operationaldatas', indicator='Interruptible Available', directionKey='exit', tsoItemIdentifier='21Z000000OGE0154', limit=-1)
