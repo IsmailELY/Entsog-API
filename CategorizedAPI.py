@@ -1,7 +1,7 @@
 from typing import Iterator
-import EntsogAPI
+import BaseAPI
 
-class OperationalAPI(EntsogAPI):
+class OperationalAPI(BaseAPI):
     def __init__(self, url:str=None, **kwargs) -> None:
         super().__init__(url=url, **kwargs)
 
@@ -17,3 +17,6 @@ class OperationalAPI(EntsogAPI):
                 Iter += 1
                 if Iter == destination: break
 
+    def set_payload(self, **kwargs) -> None:
+        """Redefine"""
+        super().set_payload(self, **kwargs)

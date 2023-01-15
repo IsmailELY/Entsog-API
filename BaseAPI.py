@@ -2,7 +2,7 @@ import requests
 import json
 import re
 
-class EntsogAPI:
+class BaseAPI:
     """Entsog API Configuration"""
     def __init__(self, category:str="operators", **kwargs) -> None:
         self.count_req = 0
@@ -13,17 +13,17 @@ class EntsogAPI:
         'aggregateInterconnections')
         self.__payload = {'offset':'0', 'limit':'5'}
         self.build_uri(category=category)
-        self.set_payload(**kwargs)
+        if kwargs: self.set_payload(**kwargs)
 
     def Reload(method):
         """Reload data after modification"""
         def inner(self, *args, **kwargs):
             method(self, *args, **kwargs)
-            if self.count_req!=0: self.__r = requests.get(self.get_uri(), params=self.__payload)
-            self.count_req+=1
+            if self.get_uri(): 
+                self.__r = requests.get(self.get_uri(), params=self.__payload)
+                self.count_req+=1
         return inner
 
-    @Reload
     def __set_uri(self, uri:str) -> None:
         """Checks the compliance of the Entsog API Uri"""
         reg = "^https://transparency\.entsog\.eu/api/v1/(operationaldatas|cmpUnsuccessfulRequests|cmpUnavailables|cmpAuctions|interruptions|AggregatedData|tariffssimulations|tariffsfulls|urgentmarketmessages|connectionpoints|operators|balancingzones|operatorpointdirections|Interconnections|aggregateInterconnections)*"
@@ -35,6 +35,7 @@ class EntsogAPI:
 
     @Reload
     def set_payload(self, **kwargs) -> None:
+        """Apply filters"""
         for property, value in kwargs.items():
             if property=='limit' and value<0:
                 continue    
@@ -50,26 +51,22 @@ class EntsogAPI:
     
     def get_uri(self) -> str:
         """Get Curent API URI"""
-        return self.__uri
+        if self.__uri: return self.__uri
+        return None
 
     def __str__(self) -> str:
         """Returns API result"""
         if self.__r.status_code < 300:
-            print(type(self.__r.json()))
             return json.dumps(self.__r.json(), indent=2)
         else:
             return f"Status Code: {self.__r.status_code}"
 
-    def read_json(self, offset=0, limit=1000, ) -> dict:
-        """Read API Content"""
-        self.set_payload(offset=offset, limit=limit)
-        content = self.__r.json()
-        if content:
-            return content | self.read(offset=offset+limit, limit=limit)
-        return None
+    def read_json(self):
+        pass
+
 
 if __name__=='__main__':
-    #d = EntsogAPI('operationaldatas', indicator='Interruptible Available', directionKey='exit', tsoItemIdentifier='21Z000000OGE0154', limit=-1)
-    d = EntsogAPI()
-    d.set_payload(indicator='Interruptible Available', directionKey='exit')
+    d = BaseAPI('operationaldatas', indicator='Interruptible Available', directionKey='exit', tsoItemIdentifier='21Z000000OGE0154', limit=-1)
+    #d = BaseAPI()
+    #d.set_payload(indicator='Interruptible Available', directionKey='exit')
     print(d)
