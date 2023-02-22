@@ -93,9 +93,3 @@ class BaseAPI:
             raise Exception("No request have been issued yet.")
     
     
-
-if __name__=='__main__':
-    #d = BaseAPI('operationaldatas', indicator='Interruptible Available', directionKey='exit', tsoItemIdentifier='21Z000000OGE0154', limit=-1)
-    d = BaseAPI()
-    d.set_payload(offset=0, limit=1000, indicator='Interruptible Available', directionKey='exit')
-    print(d.get_uri())

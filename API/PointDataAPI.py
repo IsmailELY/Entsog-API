@@ -1,16 +1,22 @@
 import BaseAPI
 import time
 
-class OperationalAPI(BaseAPI.BaseAPI):
+class OperationalDataAPI(BaseAPI.BaseAPI):
     def __init__(self, **kwargs) -> None:
         super().__init__(category="operationaldatas", **kwargs)
 
-class cmpRequests
-"cmpUnsuccessfulRequests"
+class CmpUnsuccessfulRequestsAPI(BaseAPI.BaseAPI):
+    def __init__(self, **kwargs) -> None:
+        super().__init__(category="cmpUnsuccessfulRequests", **kwargs)
 
-if __name__=='__main__':
-    # Test API section
-    a = OperationalAPI()
-    for row in a.read_json(0,50):
-        print("row: ",row)
-        time.sleep(0.3)
+class CmpUnavailablesAPI(BaseAPI.BaseAPI):
+    def __init__(self, **kwargs) -> None:
+        super().__init__(category="cmpUnavailables", **kwargs)
+
+class CmpAuctionsAPI(BaseAPI.BaseAPI):
+    def __init__(self, **kwargs) -> None:
+        super().__init__(category="cmpAuctions", **kwargs)
+
+class InterruptionsAPI(BaseAPI.BaseAPI):
+    def __init__(self, **kwargs) -> None:
+        super().__init__(category="interruptions", **kwargs)
